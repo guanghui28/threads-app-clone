@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const HomePage = () => {
 	return (
-		<Link to="/markzuckerberg">
+		<Link to="/jennyhuynh">
 			<Flex w="full" justifyContent={"center"}>
 				<Button mx="auto">Visit profile page</Button>
 			</Flex>
