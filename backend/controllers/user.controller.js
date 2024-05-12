@@ -40,11 +40,11 @@ export const signupUser = async (req, res) => {
 				username: newUser.username,
 			});
 		} else {
-			res.status(400).json({ message: "Invalid user data" });
+			res.status(400).json({ error: "Invalid user data" });
 		}
 	} catch (error) {
 		console.log("Error in signupUser controller ", error.message);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -71,7 +71,7 @@ export const loginUser = async (req, res) => {
 		});
 	} catch (error) {
 		console.log("Error in loginUser controller ", error.message);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -81,7 +81,7 @@ export const logoutUser = async (req, res) => {
 		res.status(200).json({ message: "Logout successfully!" });
 	} catch (error) {
 		console.log("Error in logoutUser controller ", error.message);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -94,11 +94,11 @@ export const followUnFollowUser = async (req, res) => {
 		if (id === req.user._id.toString()) {
 			return res
 				.status(400)
-				.json({ message: "You cannot follow/unfollow yourself" });
+				.json({ error: "You cannot follow/unfollow yourself" });
 		}
 
 		if (!userToModify || !currentUser) {
-			return res.status(404).json({ message: "User can't be found" });
+			return res.status(404).json({ error: "User can't be found" });
 		}
 
 		const isFollowing = currentUser.following.includes(userToModify._id);
@@ -127,7 +127,7 @@ export const followUnFollowUser = async (req, res) => {
 		}
 	} catch (error) {
 		console.log("Error in followUnFollowUser controller ", error.message);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -137,20 +137,20 @@ export const updateUser = async (req, res) => {
 	try {
 		let user = await User.findById(userId);
 		if (!user) {
-			return res.status(404).json({ message: "User can't be found" });
+			return res.status(404).json({ error: "User can't be found" });
 		}
 
 		if (req.params.id !== userId.toString()) {
 			return res
 				.status(401)
-				.json({ message: "Unauthorized: You can't update other's profile" });
+				.json({ error: "Unauthorized: You can't update other's profile" });
 		}
 
 		if (password) {
 			if (password.length < 6) {
 				return res
 					.status(400)
-					.json({ message: "Password must be at least 6 characters long" });
+					.json({ error: "Password must be at least 6 characters long" });
 			} else {
 				const salt = await bcrypt.genSalt(10);
 				const hashedPassword = await bcrypt.hash(password, salt);
@@ -169,7 +169,7 @@ export const updateUser = async (req, res) => {
 		res.status(200).json({ message: "Profile update successfully", user });
 	} catch (error) {
 		console.log("Error in updateUser controller ", error.message);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ error: error.message });
 	}
 };
 
@@ -180,12 +180,12 @@ export const getUserProfile = async (req, res) => {
 			.select("-password")
 			.select("-updatedAt");
 		if (!user) {
-			return res.status(404).json({ message: "User can't be found" });
+			return res.status(404).json({ error: "User can't be found" });
 		}
 
 		res.status(200).json(user);
 	} catch (error) {
 		console.log("Error in getUserProfile controller ", error.message);
-		res.status(500).json({ message: error.message });
+		res.status(500).json({ error: error.message });
 	}
 };
