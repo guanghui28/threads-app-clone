@@ -14,7 +14,6 @@ const Post = ({ post, postedBy }) => {
 	const showToast = useShowToast();
 	const [loading, setLoading] = useState(false);
 	const currentUser = useRecoilValue(userAtom);
-	const [deleting, setDeleting] = useState(false);
 
 	const navigate = useNavigate();
 
@@ -43,7 +42,6 @@ const Post = ({ post, postedBy }) => {
 	const handleDeletePost = async (e) => {
 		e.preventDefault();
 		if (!window.confirm("Are you sure you want to delete this post?")) return;
-		setDeleting(true);
 		try {
 			const res = await fetch(`/api/posts/${post._id}`, {
 				method: "DELETE",
@@ -56,8 +54,6 @@ const Post = ({ post, postedBy }) => {
 			showToast("Success", "Deleted post successfully", "success");
 		} catch (error) {
 			showToast("Error", error.message, "error");
-		} finally {
-			setDeleting(false);
 		}
 	};
 
