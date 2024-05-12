@@ -78,6 +78,12 @@ export const deletePost = async (req, res) => {
 			});
 		}
 
+		if (post.img) {
+			// delete
+			const imgId = post.img.split("/").pop().split(".")[0];
+			await cloudinary.uploader.destroy(imgId);
+		}
+
 		await Post.findByIdAndDelete(postId);
 
 		res.status(200).json({ message: "Delete post successfully!" });
@@ -131,7 +137,7 @@ export const replyPost = async (req, res) => {
 		post.replies.push(reply);
 		await post.save();
 
-		res.status(200).json({ message: "Reply added successfully", post });
+		res.status(200).json(post);
 	} catch (error) {
 		console.log("Error in replyPost controller ", error.message);
 		res.status(500).json({ error: error.message });
@@ -155,6 +161,26 @@ export const getFeedPosts = async (req, res) => {
 		res.status(200).json(feedPosts);
 	} catch (error) {
 		console.log("Error in getFeedPosts controller ", error.message);
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const getUserPosts = async (req, res) => {
+	const { username } = req.params;
+	try {
+		const user = await User.findOne({ username });
+
+		if (!user) {
+			return res.status(404).json({ error: "User can't be found" });
+		}
+
+		const posts = await Post.find({ postedBy: user._id }).sort({
+			createdAt: -1,
+		});
+
+		res.status(200).json(posts);
+	} catch (error) {
+		console.log("Error in getUserPosts controller ", error.message);
 		res.status(500).json({ error: error.message });
 	}
 };

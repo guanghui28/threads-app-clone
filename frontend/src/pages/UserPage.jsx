@@ -1,14 +1,18 @@
 import { useParams } from "react-router-dom";
 import UserHeader from "../components/UserHeader";
-import UserPost from "../components/UserPost";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { Flex, Spinner } from "@chakra-ui/react";
+import Post from "../components/Post";
 
 const UserPage = () => {
-	const [user, setUser] = useState(null);
 	const { username } = useParams();
+
+	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
+
+	const [posts, setPosts] = useState([]);
+	const [fetching, setFetching] = useState(true);
 
 	const showToast = useShowToast();
 
@@ -29,7 +33,27 @@ const UserPage = () => {
 			}
 		};
 
+		const getPosts = async () => {
+			setFetching(true);
+			try {
+				const res = await fetch(`/api/posts/user/${username}`);
+				const data = await res.json();
+
+				if (data.error) {
+					return showToast("Error", data.error, "error");
+				}
+				console.log(data);
+
+				setPosts([...data]);
+			} catch (error) {
+				showToast("Error", error.message, "error");
+			} finally {
+				setFetching(false);
+			}
+		};
+
 		getUser();
+		getPosts();
 	}, [username, showToast]);
 
 	if (!user && loading)
@@ -44,29 +68,16 @@ const UserPage = () => {
 	return (
 		<>
 			<UserHeader user={user} />
-			<UserPost
-				likes={123}
-				replies={456}
-				postImg="/post1.png"
-				postTitle="Let's talk about threads."
-			/>
-			<UserPost
-				likes={123}
-				replies={456}
-				postImg="/post2.png"
-				postTitle="Let's talk about threads."
-			/>
-			<UserPost
-				likes={123}
-				replies={456}
-				postImg="/post3.png"
-				postTitle="Let's talk about threads."
-			/>
-			<UserPost
-				likes={123}
-				replies={456}
-				postTitle="Let's talk about threads."
-			/>
+
+			{!fetching && posts.length === 0 && <h1>User has no posts.</h1>}
+			{fetching && (
+				<Flex justifyContent={"center"}>
+					<Spinner size="xl" my={12} />
+				</Flex>
+			)}
+			{posts.map((post) => (
+				<Post key={post._id} post={post} postedBy={post.postedBy} />
+			))}
 		</>
 	);
 };
