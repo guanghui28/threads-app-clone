@@ -1,8 +1,11 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
 import { useNavigate, useParams } from "react-router-dom";
+import { useSetRecoilState } from "recoil";
+import postsAtom from "../atoms/postsAtom";
 
 const useDeletePost = () => {
+	const setPosts = useSetRecoilState(postsAtom);
 	const { username } = useParams();
 	const showToast = useShowToast();
 	const [deleting, setDeleting] = useState(false);
@@ -22,6 +25,7 @@ const useDeletePost = () => {
 			}
 
 			showToast("Success", "Deleted post successfully", "success");
+			setPosts((posts) => posts.filter((p) => p._id !== postId));
 			navigate(`/${username}`);
 		} catch (error) {
 			showToast("Error", error.message, "error");
