@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
+import mongoose from "mongoose";
 
 export const signupUser = async (req, res) => {
 	try {
@@ -192,11 +193,23 @@ export const updateUser = async (req, res) => {
 };
 
 export const getUserProfile = async (req, res) => {
+	// this function handle either username or objectId as params
+	const { query } = req.params;
 	try {
-		const { username } = req.params;
-		const user = await User.findOne({ username })
-			.select("-password")
-			.select("-updatedAt");
+		let user;
+
+		// query is userId
+		if (mongoose.Types.ObjectId.isValid(query)) {
+			user = await User.findOne({ _id: query })
+				.select("-password")
+				.select("-updatedAt");
+		} else {
+			// query is username
+			user = await User.findOne({ username: query })
+				.select("-password")
+				.select("-updatedAt");
+		}
+
 		if (!user) {
 			return res.status(404).json({ error: "User can't be found" });
 		}

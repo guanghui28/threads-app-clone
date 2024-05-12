@@ -114,7 +114,7 @@ export const likeUnlikePost = async (req, res) => {
 
 export const replyPost = async (req, res) => {
 	const { id: postId } = req.params;
-	const { _id: userId, userProfilePic, username } = req.user;
+	const { _id: userId, profilePic, username } = req.user;
 	try {
 		const { text } = req.body;
 		if (!text) {
@@ -126,7 +126,7 @@ export const replyPost = async (req, res) => {
 			return res.status(404).json({ error: "Post can't be found" });
 		}
 
-		const reply = { userId, text, userProfilePic, username };
+		const reply = { userId, text, profilePic, username };
 
 		post.replies.push(reply);
 		await post.save();
