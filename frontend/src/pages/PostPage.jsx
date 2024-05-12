@@ -5,55 +5,96 @@ import {
 	Divider,
 	Flex,
 	Image,
+	Spinner,
 	Text,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import { BsThreeDots } from "react-icons/bs";
 import Actions from "../components/Actions";
+import useGetUserProfile from "../hooks/useGetUserProfile";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import useShowToast from "../hooks/useShowToast";
+import { formatDistanceToNow } from "date-fns";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import useDeletePost from "../hooks/useDeletePost";
 import Comment from "../components/Comment";
 
 const PostPage = () => {
-	const [liked, setLiked] = useState(false);
+	const currentUser = useRecoilValue(userAtom);
+
+	const { user, loading } = useGetUserProfile();
+	const { pid: postId } = useParams();
+	const [post, setPost] = useState(null);
+	const showToast = useShowToast();
+	const { deletePost } = useDeletePost();
+
+	useEffect(() => {
+		const getPost = async () => {
+			try {
+				const res = await fetch(`/api/posts/${postId}`);
+				const data = await res.json();
+
+				if (data.error) {
+					return showToast("Error", data.error, "error");
+				}
+				console.log(data);
+				setPost(data);
+			} catch (error) {
+				showToast("Error", error.message, "error");
+			}
+		};
+		getPost();
+	}, [showToast, postId]);
+
+	if (!user || loading) {
+		return (
+			<Flex justifyContent="center">
+				<Spinner size="xl" />
+			</Flex>
+		);
+	}
+
+	if (!post) return null;
+
 	return (
 		<>
 			<Flex>
 				<Flex w={"full"} alignItems={"center"} gap={3}>
-					<Avatar src="/zuck-avatar.png" name="zuckerberg avatar" />
+					<Avatar src={user.profilePic} name={user.name} />
 					<Flex alignItems={"center"}>
 						<Text fontSize="sm" fontWeight={"bold"}>
-							markzuckerberg
+							{user.username}
 						</Text>
 						<Image src="/verified.png" w={4} h={4} ml={4} />
 					</Flex>
 				</Flex>
 				<Flex gap={4} alignItems={"center"}>
-					<Text fontSize={"sm"} color={"gray.light"}>
-						1d
+					<Text fontSize={"sm"} w={36} textAlign="right" color={"gray.light"}>
+						{formatDistanceToNow(new Date(post.createdAt))} ago
 					</Text>
-					<BsThreeDots />
+					{currentUser?._id === user._id && (
+						<DeleteIcon
+							size={20}
+							onClick={(e) => deletePost(e, post._id)}
+							cursor={"pointer"}
+						/>
+					)}
 				</Flex>
 			</Flex>
-			<Text my={3}>Let&apos;s talk about threads.</Text>
+			<Text my={3}>{post.text}</Text>
 			<Box
 				borderRadius={6}
 				overflow="hidden"
 				border={"1px solid"}
 				borderColor={"gray.light"}
 			>
-				<Image src={"/post1.png"} w="full" />
+				{post.img && <Image src={post.img} w="full" />}
 			</Box>
 			<Flex gap={3} my={3}>
-				<Actions liked={liked} setLiked={setLiked} />
+				<Actions post={post} />
 			</Flex>
-			<Flex gap={2} alignItems={"center"}>
-				<Text color={"gray.light"} fontSize={"sm"}>
-					238 replies
-				</Text>
-				<Box w={0.5} h={0.5} borderRadius="full" bg={"gray.light"}></Box>
-				<Text color="gray.light" fontSize="sm">
-					{200 + (liked ? 1 : 0)} likes
-				</Text>
-			</Flex>
+
 			<Divider my={4} />
 			<Flex justifyContent={"space-between"}>
 				<Flex gap={2} alignItems={"center"}>
@@ -63,34 +104,19 @@ const PostPage = () => {
 				<Button>Get</Button>
 			</Flex>
 			<Divider my={4} />
-			<Comment
-				comment="It's look great!"
-				createdAt="2d"
-				likes={100}
-				username="johndoe"
-				userAvatar="https://bit.ly/dan-abramov"
-			/>
-			<Comment
-				comment="Very good"
-				createdAt="3d"
-				likes={101}
-				username="hola2d"
-				userAvatar="https://bit.ly/code-beast"
-			/>
-			<Comment
-				comment="Beautiful!"
-				createdAt="2d"
-				likes={150}
-				username="dodds"
-				userAvatar="https://bit.ly/kent-c-dodds"
-			/>
-			<Comment
-				comment="Great job!"
-				createdAt="1d"
-				likes={120}
-				username="baba"
-				userAvatar="https://bit.ly/sage-adebayo"
-			/>
+			{post.replies.length > 0 ? (
+				post.replies.map((reply) => (
+					<Comment
+						key={reply._id}
+						reply={reply}
+						isLastReply={
+							reply._id === post.replies[post.replies.length - 1]._id
+						}
+					/>
+				))
+			) : (
+				<p>Have no one comment :((</p>
+			)}
 		</>
 	);
 };

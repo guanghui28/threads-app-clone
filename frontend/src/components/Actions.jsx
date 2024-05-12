@@ -77,7 +77,6 @@ const Actions = ({ post: post_ }) => {
 			});
 
 			const data = await res.json();
-			console.log(data);
 			if (data.error) {
 				return showToast("Error", data.error, "error");
 			}
@@ -103,6 +102,7 @@ const Actions = ({ post: post_ }) => {
 					role="img"
 					viewBox="0 0 24 22"
 					width="20"
+					cursor={"pointer"}
 					onClick={handleLikeAndUnlike}
 				>
 					<path
@@ -121,6 +121,7 @@ const Actions = ({ post: post_ }) => {
 					viewBox="0 0 24 24"
 					width="20"
 					onClick={onOpen}
+					cursor={"pointer"}
 				>
 					<title>Comment</title>
 					<path
@@ -189,6 +190,7 @@ const RepostSVG = () => {
 			role="img"
 			viewBox="0 0 24 24"
 			width="20"
+			cursor={"pointer"}
 		>
 			<title>Repost</title>
 			<path
@@ -209,6 +211,7 @@ const ShareSVG = () => {
 			role="img"
 			viewBox="0 0 24 24"
 			width="20"
+			cursor={"pointer"}
 		>
 			<title>Share</title>
 			<line
