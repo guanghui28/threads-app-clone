@@ -86,8 +86,6 @@ const CreatePost = () => {
 		}
 	};
 
-	console.log("post recoil atom: ", posts);
-
 	return (
 		<>
 			<Button

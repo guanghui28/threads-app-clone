@@ -2,11 +2,13 @@ import { Flex, Spinner } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import Post from "../components/Post";
+import { useRecoilState } from "recoil";
+import postsAtom from "../atoms/postsAtom";
 
 const HomePage = () => {
-	const showToast = useShowToast();
-	const [posts, setPosts] = useState([]);
+	const [posts, setPosts] = useRecoilState(postsAtom);
 	const [loading, setLoading] = useState(false);
+	const showToast = useShowToast();
 
 	useEffect(() => {
 		const feedPosts = async () => {
@@ -18,7 +20,6 @@ const HomePage = () => {
 					showToast("Error", data.error, "error");
 				}
 				setPosts(data);
-				console.log(data);
 			} catch (error) {
 				showToast("Error", error.message, "error");
 			} finally {
@@ -26,7 +27,7 @@ const HomePage = () => {
 			}
 		};
 		feedPosts();
-	}, [showToast]);
+	}, [showToast, setPosts]);
 
 	return (
 		<>

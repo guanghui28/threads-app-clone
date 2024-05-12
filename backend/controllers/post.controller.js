@@ -132,12 +132,13 @@ export const replyPost = async (req, res) => {
 			return res.status(404).json({ error: "Post can't be found" });
 		}
 
-		const reply = { userId, text, profilePic, username };
+		const newReply = { userId, text, profilePic, username };
 
-		post.replies.push(reply);
+		post.replies.push(newReply);
 		await post.save();
 
-		res.status(200).json(post);
+		const reply = post.replies[post.replies.length - 1];
+		res.status(200).json(reply);
 	} catch (error) {
 		console.log("Error in replyPost controller ", error.message);
 		res.status(500).json({ error: error.message });

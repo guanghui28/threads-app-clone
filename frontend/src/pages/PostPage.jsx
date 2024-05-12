@@ -11,23 +11,25 @@ import {
 import Actions from "../components/Actions";
 import useGetUserProfile from "../hooks/useGetUserProfile";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useShowToast from "../hooks/useShowToast";
 import { formatDistanceToNow } from "date-fns";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useDeletePost from "../hooks/useDeletePost";
 import Comment from "../components/Comment";
+import postsAtom from "../atoms/postsAtom";
 
 const PostPage = () => {
+	const [posts, setPosts] = useRecoilState(postsAtom);
 	const currentUser = useRecoilValue(userAtom);
-
 	const { user, loading } = useGetUserProfile();
 	const { pid: postId } = useParams();
-	const [post, setPost] = useState(null);
 	const showToast = useShowToast();
 	const { deletePost } = useDeletePost();
+
+	const currentPost = posts[0];
 
 	useEffect(() => {
 		const getPost = async () => {
@@ -38,14 +40,13 @@ const PostPage = () => {
 				if (data.error) {
 					return showToast("Error", data.error, "error");
 				}
-				console.log(data);
-				setPost(data);
+				setPosts([data]);
 			} catch (error) {
 				showToast("Error", error.message, "error");
 			}
 		};
 		getPost();
-	}, [showToast, postId]);
+	}, [showToast, postId, setPosts]);
 
 	if (!user || loading) {
 		return (
@@ -55,7 +56,8 @@ const PostPage = () => {
 		);
 	}
 
-	if (!post) return null;
+	if (!currentPost) return null;
+	console.log("currentPost: ", currentPost.replies);
 
 	return (
 		<>
@@ -71,28 +73,28 @@ const PostPage = () => {
 				</Flex>
 				<Flex gap={4} alignItems={"center"}>
 					<Text fontSize={"sm"} w={36} textAlign="right" color={"gray.light"}>
-						{formatDistanceToNow(new Date(post.createdAt))} ago
+						{formatDistanceToNow(new Date(currentPost.createdAt))} ago
 					</Text>
 					{currentUser?._id === user._id && (
 						<DeleteIcon
 							size={20}
-							onClick={(e) => deletePost(e, post._id)}
+							onClick={(e) => deletePost(e, currentPost._id)}
 							cursor={"pointer"}
 						/>
 					)}
 				</Flex>
 			</Flex>
-			<Text my={3}>{post.text}</Text>
+			<Text my={3}>{currentPost.text}</Text>
 			<Box
 				borderRadius={6}
 				overflow="hidden"
 				border={"1px solid"}
 				borderColor={"gray.light"}
 			>
-				{post.img && <Image src={post.img} w="full" />}
+				{currentPost.img && <Image src={currentPost.img} w="full" />}
 			</Box>
 			<Flex gap={3} my={3}>
-				<Actions post={post} />
+				<Actions post={currentPost} />
 			</Flex>
 
 			<Divider my={4} />
@@ -104,13 +106,14 @@ const PostPage = () => {
 				<Button>Get</Button>
 			</Flex>
 			<Divider my={4} />
-			{post.replies.length > 0 ? (
-				post.replies.map((reply) => (
+			{currentPost.replies.length > 0 ? (
+				currentPost.replies.map((reply) => (
 					<Comment
 						key={reply._id}
 						reply={reply}
 						isLastReply={
-							reply._id === post.replies[post.replies.length - 1]._id
+							reply._id ===
+							currentPost.replies[currentPost.replies.length - 1]._id
 						}
 					/>
 				))
