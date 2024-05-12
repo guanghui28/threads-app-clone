@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import { v2 as cloudinary } from "cloudinary";
 import generateTokenAndSetCookie from "../utils/helpers/generateTokenAndSetCookie.js";
 
 export const signupUser = async (req, res) => {
@@ -38,6 +39,8 @@ export const signupUser = async (req, res) => {
 				name: newUser.name,
 				email: newUser.email,
 				username: newUser.username,
+				bio: newUser.bio,
+				profilePic: newUser.profilePic,
 			});
 		} else {
 			res.status(400).json({ error: "Invalid user data" });
@@ -68,6 +71,8 @@ export const loginUser = async (req, res) => {
 			name: user.name,
 			email: user.email,
 			username: user.username,
+			bio: user.bio,
+			profilePic: user.profilePic,
 		});
 	} catch (error) {
 		console.log("Error in loginUser controller ", error.message);
@@ -132,7 +137,8 @@ export const followUnFollowUser = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
-	const { name, email, password, username, profilePic, bio } = req.body;
+	const { name, email, password, username, bio } = req.body;
+	let { profilePic } = req.body;
 	const userId = req.user._id;
 	try {
 		let user = await User.findById(userId);
@@ -158,15 +164,27 @@ export const updateUser = async (req, res) => {
 			}
 		}
 
+		if (profilePic) {
+			if (user.profilePic) {
+				await cloudinary.uploader.destroy(
+					user.profilePic.split("/").pop().split(".")[0]
+				);
+			}
+			const uploadedResponse = await cloudinary.uploader.upload(profilePic);
+			profilePic = uploadedResponse.secure_url;
+		}
+
 		user.name = name || user.name;
 		user.email = email || user.email;
 		user.username = username || user.username;
 		user.profilePic = profilePic || user.profilePic;
 		user.bio = bio || user.bio;
 
-		await user.save();
+		user = await user.save();
 
-		res.status(200).json({ message: "Profile update successfully", user });
+		user.password = null;
+
+		res.status(200).json(user);
 	} catch (error) {
 		console.log("Error in updateUser controller ", error.message);
 		res.status(500).json({ error: error.message });
