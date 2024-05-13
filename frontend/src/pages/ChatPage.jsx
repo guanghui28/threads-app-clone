@@ -36,7 +36,6 @@ const ChatPage = () => {
 				if (data.error) {
 					return showToast("Error", data.error, "error");
 				}
-				console.log("conversations: ", data);
 				setConversations(data);
 			} catch (error) {
 				showToast("Error", error.message, "error");

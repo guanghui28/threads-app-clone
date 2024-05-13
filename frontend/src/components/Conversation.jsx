@@ -23,7 +23,6 @@ const Conversation = ({ conversation }) => {
 	const lastMessage = conversation.lastMessage;
 	const colorMode = useColorMode();
 
-	console.log("Selected Conversation: ", selectedConversation);
 	return (
 		<Flex
 			gap={4}
