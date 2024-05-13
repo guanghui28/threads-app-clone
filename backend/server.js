@@ -8,9 +8,10 @@ import connectDB from "./db/connectDB.js";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import messageRoutes from "./routes/message.route.js";
-
 import { app, server } from "./socket/socket.js";
+import job from "./cron/cront.js";
 
+job.start();
 dotenv.config();
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
