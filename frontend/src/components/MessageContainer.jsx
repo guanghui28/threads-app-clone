@@ -8,6 +8,7 @@ import {
 	Text,
 	useColorModeValue,
 } from "@chakra-ui/react";
+import messageSound from "../assets/sounds/message.mp3";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -32,6 +33,11 @@ const MessageContainer = () => {
 		socket.on("newMessage", (message) => {
 			if (selectedConversation._id === message.conversationId) {
 				setMessages((prevMessages) => [...prevMessages, message]);
+			}
+
+			if (!document.hasFocus) {
+				const sound = new Audio(messageSound);
+				sound.play();
 			}
 
 			setConversations((preConversations) =>
