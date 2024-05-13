@@ -6,6 +6,7 @@ import { v2 as cloudinary } from "cloudinary";
 import connectDB from "./db/connectDB.js";
 import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
+import messageRoutes from "./routes/message.route.js";
 
 dotenv.config();
 cloudinary.config({
@@ -24,6 +25,7 @@ app.use(cookieParser());
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.listen(PORT, () => {
 	connectDB();
