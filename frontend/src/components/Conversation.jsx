@@ -13,6 +13,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import selectedConversationAtom from "../atoms/selectedConversationAtom";
 import { CheckIcon } from "@chakra-ui/icons";
+import { BsFillImageFill } from "react-icons/bs";
 
 const Conversation = ({ conversation, isOline }) => {
 	const [selectedConversation, setSelectedConversation] = useRecoilState(
@@ -72,13 +73,14 @@ const Conversation = ({ conversation, isOline }) => {
 						<CheckIcon
 							size={16}
 							color={lastMessage.seen ? "blue.400" : "gray.200"}
+							mr={2}
 						/>
 					) : (
 						""
 					)}
 					{lastMessage.text.length > 18
 						? lastMessage.text.slice(0, 18) + "..."
-						: lastMessage.text}
+						: lastMessage.text || <BsFillImageFill size={16} />}
 				</Text>
 			</Stack>
 		</Flex>
