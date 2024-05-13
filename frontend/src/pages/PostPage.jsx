@@ -33,6 +33,7 @@ const PostPage = () => {
 
 	useEffect(() => {
 		const getPost = async () => {
+			setPosts([]);
 			try {
 				const res = await fetch(`/api/posts/${postId}`);
 				const data = await res.json();
@@ -57,7 +58,6 @@ const PostPage = () => {
 	}
 
 	if (!currentPost) return null;
-	console.log("currentPost: ", currentPost.replies);
 
 	return (
 		<>
