@@ -8,6 +8,8 @@ import userRoutes from "./routes/user.route.js";
 import postRoutes from "./routes/post.route.js";
 import messageRoutes from "./routes/message.route.js";
 
+import { app, server } from "./socket/socket.js";
+
 dotenv.config();
 cloudinary.config({
 	cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -27,7 +29,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/messages", messageRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
 	connectDB();
 	console.log(`server is running at http://localhost:${PORT}`);
 });
