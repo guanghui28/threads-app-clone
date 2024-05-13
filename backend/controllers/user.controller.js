@@ -66,6 +66,11 @@ export const loginUser = async (req, res) => {
 			return res.status(400).json({ error: "Invalid username or password!" });
 		}
 
+		if (user.isFrozen) {
+			user.isFrozen = false;
+			await user.save();
+		}
+
 		generateTokenAndSetCookie(user._id, res);
 
 		res.status(200).json({
@@ -267,6 +272,25 @@ export const getSuggestedUsers = async (req, res) => {
 		res.status(200).json(suggestedUsers);
 	} catch (error) {
 		console.log("Error in getSuggestedUsers controller ", error.message);
+		res.status(500).json({ error: error.message });
+	}
+};
+
+export const freezeAccount = async (req, res) => {
+	const userId = req.user._id;
+	try {
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ error: "User can't be found!" });
+		}
+
+		user.isFrozen = true;
+		await user.save();
+
+		res.status(200).json({ success: true });
+	} catch (error) {
+		console.log("Error in freezeAccount controller ", error.message);
 		res.status(500).json({ error: error.message });
 	}
 };

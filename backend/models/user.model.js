@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "",
 		},
+		isFrozen: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{ timestamps: true }
 );
