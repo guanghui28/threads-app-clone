@@ -40,6 +40,7 @@ const Conversation = ({ conversation }) => {
 					userId: user._id,
 					profilePic: user.profilePic,
 					username: user.username,
+					mock: conversation.mock,
 				})
 			}
 			bg={
