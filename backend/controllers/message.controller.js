@@ -70,11 +70,19 @@ export const getMessages = async (req, res) => {
 export const getConversations = async (req, res) => {
 	const userId = req.user._id;
 	try {
-		const conversations = await Conversation.find({
+		let conversations = await Conversation.find({
 			participants: userId,
 		}).populate({
 			path: "participants",
 			select: "username profilePic",
+		});
+
+		// remove the current user from the participants array
+
+		conversations.forEach((conversation) => {
+			conversation.participants = conversation.participants.find(
+				(participant) => participant._id.toString() !== userId.toString()
+			);
 		});
 
 		res.status(200).json(conversations);
