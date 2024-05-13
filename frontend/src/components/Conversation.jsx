@@ -69,7 +69,10 @@ const Conversation = ({ conversation, isOline }) => {
 				</Text>
 				<Text fontSize="xs" display="flex" alignItems="center">
 					{currentUser._id === lastMessage.sender ? (
-						<CheckIcon size={16} color={lastMessage.seen ? "blue.400" : ""} />
+						<CheckIcon
+							size={16}
+							color={lastMessage.seen ? "blue.400" : "gray.200"}
+						/>
 					) : (
 						""
 					)}
