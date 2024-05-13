@@ -18,6 +18,7 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import conversationsAtom from "../atoms/conversationsAtom";
 import selectedConversationAtom from "../atoms/selectedConversationAtom";
 import userAtom from "../atoms/userAtom";
+import { useSocket } from "../context/SocketContext";
 
 const ChatPage = () => {
 	const currentUser = useRecoilValue(userAtom);
@@ -25,6 +26,7 @@ const ChatPage = () => {
 		selectedConversationAtom
 	);
 	const [conversations, setConversations] = useRecoilState(conversationsAtom);
+	const { onlineUsers } = useSocket();
 	const [loadingConversations, setLoadingConversations] = useState(false);
 	const [searchingUser, setSearchingUser] = useState(false);
 	const [searchText, setSearchText] = useState("");
@@ -188,6 +190,7 @@ const ChatPage = () => {
 						conversations.map((conversation) => (
 							<Conversation
 								key={conversation._id}
+								isOline={onlineUsers.includes(conversation.participants[0]._id)}
 								conversation={conversation}
 							/>
 						))}

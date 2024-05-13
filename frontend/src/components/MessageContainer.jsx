@@ -10,18 +10,52 @@ import {
 } from "@chakra-ui/react";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import selectedConversationAtom from "../atoms/selectedConversationAtom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useShowToast from "../hooks/useShowToast";
 import userAtom from "../atoms/userAtom";
+import { useSocket } from "../context/SocketContext";
+import conversationsAtom from "../atoms/conversationsAtom";
 
 const MessageContainer = () => {
+	const { socket } = useSocket();
 	const currentUser = useRecoilValue(userAtom);
 	const selectedConversation = useRecoilValue(selectedConversationAtom);
+	const setConversations = useSetRecoilState(conversationsAtom);
 	const [loading, setLoading] = useState(false);
 	const [messages, setMessages] = useState([]);
+	const messageEndRef = useRef(null);
 	const showToast = useShowToast();
+
+	useEffect(() => {
+		socket.on("newMessage", (message) => {
+			if (selectedConversation._id === message.conversationId) {
+				setMessages((prevMessages) => [...prevMessages, message]);
+			}
+
+			setConversations((preConversations) =>
+				preConversations.map((conversation) => {
+					if (conversation._id === message.conversationId) {
+						return {
+							...conversation,
+							lastMessage: {
+								text: message.text,
+								sender: message.sender,
+							},
+						};
+					}
+					return conversation;
+				})
+			);
+		});
+
+		return () => socket.off("newMessage");
+	}, [socket, selectedConversation._id, setConversations]);
+
+	useEffect(() => {
+		messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	}, [messages]);
 
 	useEffect(() => {
 		const getMessages = async () => {
@@ -91,11 +125,20 @@ const MessageContainer = () => {
 					))}
 				{!loading &&
 					messages.map((message) => (
-						<Message
+						<Flex
 							key={message._id}
-							ownMessage={message.sender === currentUser._id}
-							message={message}
-						/>
+							flexDirection={"column"}
+							ref={
+								messages.length - 1 === messages.indexOf(message)
+									? messageEndRef
+									: null
+							}
+						>
+							<Message
+								ownMessage={message.sender === currentUser._id}
+								message={message}
+							/>
+						</Flex>
 					))}
 			</Flex>
 			<MessageInput setMessages={setMessages} />

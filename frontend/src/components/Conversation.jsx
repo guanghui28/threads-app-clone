@@ -14,7 +14,7 @@ import userAtom from "../atoms/userAtom";
 import { BsCheck2All } from "react-icons/bs";
 import selectedConversationAtom from "../atoms/selectedConversationAtom";
 
-const Conversation = ({ conversation }) => {
+const Conversation = ({ conversation, isOline }) => {
 	const [selectedConversation, setSelectedConversation] = useRecoilState(
 		selectedConversationAtom
 	);
@@ -60,7 +60,7 @@ const Conversation = ({ conversation }) => {
 					}}
 					src={user.profilePic}
 				>
-					<AvatarBadge boxSize="1em" bg="green.500" />
+					{isOline && <AvatarBadge boxSize="1em" bg="green.500" />}
 				</Avatar>
 			</WrapItem>
 			<Stack direction="column" fontSize="sm">
