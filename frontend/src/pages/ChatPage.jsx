@@ -26,11 +26,30 @@ const ChatPage = () => {
 		selectedConversationAtom
 	);
 	const [conversations, setConversations] = useRecoilState(conversationsAtom);
-	const { onlineUsers } = useSocket();
+	const { socket, onlineUsers } = useSocket();
 	const [loadingConversations, setLoadingConversations] = useState(false);
 	const [searchingUser, setSearchingUser] = useState(false);
 	const [searchText, setSearchText] = useState("");
 	const showToast = useShowToast();
+
+	useEffect(() => {
+		socket?.on("messagesSeen", ({ conversationId }) => {
+			setConversations((prevConversations) =>
+				prevConversations.map((conversation) => {
+					if (conversation._id === conversationId) {
+						return {
+							...conversation,
+							lastMessage: {
+								...conversation.lastMessage,
+								seen: true,
+							},
+						};
+					}
+					return conversation;
+				})
+			);
+		});
+	}, [setConversations, socket]);
 
 	useEffect(() => {
 		const getConversations = async () => {

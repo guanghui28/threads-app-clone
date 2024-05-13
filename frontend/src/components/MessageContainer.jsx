@@ -54,6 +54,35 @@ const MessageContainer = () => {
 	}, [socket, selectedConversation._id, setConversations]);
 
 	useEffect(() => {
+		const lastMessageIsFromOtherUser =
+			messages.length &&
+			messages[messages.length - 1].sender !== currentUser._id;
+
+		if (lastMessageIsFromOtherUser) {
+			socket.emit("markMessagesAsSeen", {
+				conversationId: selectedConversation._id,
+				userId: selectedConversation.userId,
+			});
+		}
+
+		socket.on("messagesSeen", ({ conversationId }) => {
+			if (selectedConversation._id === conversationId) {
+				setMessages((prevMessages) =>
+					prevMessages.map((message) => {
+						if (!message.seen) {
+							return {
+								...message,
+								seen: true,
+							};
+						}
+						return message;
+					})
+				);
+			}
+		});
+	}, [currentUser._id, messages, socket, selectedConversation]);
+
+	useEffect(() => {
 		messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	}, [messages]);
 

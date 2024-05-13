@@ -11,8 +11,8 @@ import {
 } from "@chakra-ui/react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
-import { BsCheck2All } from "react-icons/bs";
 import selectedConversationAtom from "../atoms/selectedConversationAtom";
+import { CheckIcon } from "@chakra-ui/icons";
 
 const Conversation = ({ conversation, isOline }) => {
 	const [selectedConversation, setSelectedConversation] = useRecoilState(
@@ -69,7 +69,7 @@ const Conversation = ({ conversation, isOline }) => {
 				</Text>
 				<Text fontSize="xs" display="flex" alignItems="center">
 					{currentUser._id === lastMessage.sender ? (
-						<BsCheck2All size={16} />
+						<CheckIcon size={16} color={lastMessage.seen ? "blue.400" : ""} />
 					) : (
 						""
 					)}
