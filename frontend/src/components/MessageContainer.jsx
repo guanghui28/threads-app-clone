@@ -35,7 +35,7 @@ const MessageContainer = () => {
 				setMessages((prevMessages) => [...prevMessages, message]);
 			}
 
-			if (!document.hasFocus) {
+			if (!document.hasFocus()) {
 				const sound = new Audio(messageSound);
 				sound.play();
 			}
@@ -103,7 +103,6 @@ const MessageContainer = () => {
 				if (data.error) {
 					return showToast("Error", data.error, "error");
 				}
-				console.log("conversations: ", data);
 				setMessages(data);
 			} catch (error) {
 				showToast("Error", error.message, "error");

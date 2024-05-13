@@ -26,7 +26,6 @@ const UserHeader = ({ user }) => {
 
 	const copyUrl = async () => {
 		const currentUrl = window.location.href;
-		console.log(window);
 		await navigator.clipboard.writeText(currentUrl);
 		showToast("Copy URL", "Profile link was copied", "success");
 	};

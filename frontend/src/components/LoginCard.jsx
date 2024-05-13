@@ -52,7 +52,7 @@ export default function LoginCard() {
 			localStorage.setItem("user-threads", JSON.stringify(data));
 			setUser(data);
 		} catch (error) {
-			console.log(error);
+			showToast("Error", error.message, "error");
 		} finally {
 			setLoading(false);
 		}

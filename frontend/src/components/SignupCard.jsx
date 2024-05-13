@@ -36,7 +36,6 @@ export default function SignupCard() {
 	const showToast = useShowToast();
 
 	const handleSignup = async () => {
-		console.log(inputs);
 		try {
 			const res = await fetch("/api/users/signup", {
 				method: "POST",
@@ -54,7 +53,7 @@ export default function SignupCard() {
 			localStorage.setItem("user-threads", JSON.stringify(data));
 			setUser(data);
 		} catch (error) {
-			console.log(error);
+			showToast("Error", error.message, "error");
 		}
 	};
 

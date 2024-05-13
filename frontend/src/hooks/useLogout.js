@@ -31,7 +31,7 @@ const useLogout = () => {
 			});
 			navigate("/auth");
 		} catch (error) {
-			console.log(error);
+			showToast("Error", error.message, "error");
 		}
 	};
 	return { logout };
